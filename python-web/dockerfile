@@ -1,0 +1,18 @@
+# Use the official Python image as a base image
+FROM python:3.8-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the application files to the container
+COPY web.py /app
+
+# Install dependencies
+RUN pip install Flask prometheus-flask-exporter
+
+# Expose the necessary ports
+EXPOSE 80
+EXPOSE 3000
+
+# Command to run the application
+CMD ["python", "web.py"]
