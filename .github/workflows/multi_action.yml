@@ -1,0 +1,84 @@
+name: Multi Docker Image Build
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'docker/nginx-basic/**'
+      - 'docker/nodejs-web/**'
+      - 'docker/python-web/**'
+  pull_request:
+    paths:
+      - 'docker/nginx-basic/**'
+      - 'docker/nodejs-web/**'
+      - 'docker/python-web/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: nginx-basic
+            path: docker/nginx-basic
+            dockerfile: docker/nginx-basic/dockerfile
+          - name: nodejs-web
+            path: docker/nodejs-web
+            dockerfile: docker/nodejs-web/dockerfile
+          - name: python-web
+            path: docker/python-web
+            dockerfile: docker/python-web/dockerfile
+
+    steps:
+      - name: ✅ 레포지토리 코드 가져오기
+        uses: actions/checkout@v3
+
+      - name: 📅 태그 생성
+        id: image_tag
+        run: |
+          DATE=$(date +'%Y%m%d')
+          VERSION_COUNT=$(git ls-remote --tags origin | grep "$DATE" | wc -l)
+          TAG="${DATE}v$((VERSION_COUNT + 1))"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+
+      - name: 📌 변경된 파일 확인
+        id: changed-files
+        uses: tj-actions/changed-files@v39
+        with:
+          files: |
+            docker/nginx-basic/**
+            docker/nodejs-web/**
+            docker/python-web/**
+
+      - name: 🔍 변경된 디렉토리 확인
+        id: check-changes
+        run: |
+          if [[ "${{ steps.changed-files.outputs.all_changed_files }}" == *"${{ matrix.path }}"* ]]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: 🐳 Docker 빌드 (변경된 경우에만)
+        if: steps.check-changes.outputs.changed == 'true'
+        run: |
+          echo "Building ${{ matrix.name }} image..."
+          docker build -t chulbori/${{ matrix.name }}:${{ steps.image_tag.outputs.TAG }} -f ${{ matrix.dockerfile }} ${{ matrix.path }}
+
+      - name: 📦 Docker 이미지 확인
+        if: steps.check-changes.outputs.changed == 'true'
+        run: |
+          echo "Listing Docker images for ${{ matrix.name }}..."
+          docker images | grep chulbori/${{ matrix.name }}
+
+      - name: Show Docker Image Tags
+        run: |
+          echo "Built Tag: ${{ steps.image_tag.outputs.TAG }}"
+
+      - name: Docker HUB 로그인
+        run: |
+          echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: 📦 Docker 이미지 푸시
+        run: |
+          docker push chulbori/${{ matrix.name }}:${{ steps.image_tag.outputs.TAG }}
