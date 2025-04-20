@@ -26,7 +26,7 @@ jobs:
 
       - name: 🐳 Docker 빌드
         run: |
-          docker build -t chulbori/nginx-basic:${{ steps.get_version.outputs.TAG }} .
+          docker build -t chulbori/nginx-basic:${{ steps.get_version.outputs.TAG }} ./nginx-basic
 
       - name: 📦 Docker 이미지 확인
         run: |
