@@ -1,11 +1,19 @@
-FROM centos:7
-RUN touch /etc/yum.repos.d/nginx.repo && echo -e '[nginx]\nname=nage repo\nbaseurl=http://nginx.org/packages/centos/7/$basearch/\ngpgcheck=0\nenabled=1' > /etc/yum.repos.d/nginx.repo
-RUN yum -y install nginx
-RUN rm /etc/nginx/conf.d/default.conf
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+
+# nginx 사용자 생성
+RUN useradd -r -s /sbin/nologin nginx
+
+RUN rm /etc/nginx/sites-enabled/default
 COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./product.conf /etc/nginx/conf.d/product.conf
 COPY ./index.html /var/www/html/index.html
+COPY ./style.css /var/www/html/style.css
 COPY ./smile.jpg /var/www/html/smile.jpg
+COPY ./me.png /var/www/html/me.png
+COPY ./house.png /var/www/html/house.png
 COPY ./version /var/www/html/state/version
+
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
