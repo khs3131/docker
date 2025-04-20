@@ -31,3 +31,17 @@ jobs:
       - name: 📦 Docker 이미지 확인
         run: |
           docker images
+      
+      - name: Show Docker Image Tags
+        run: |
+          echo "Built Tag: ${{ steps.get_version.outputs.TAG }}"
+
+      - name: Docker HUB 로그인
+        run: |
+          echo ${{ secrets.DOCKER_HUB_PASSWORD }} | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
+      - name: 📦 Docker 이미지 푸시
+        run: |
+          docker push chulbori/nginx-basic:${{ steps.get_version.outputs.TAG }}
+
+      

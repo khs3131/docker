@@ -10,9 +10,10 @@ COPY ./nginx.conf /etc/nginx/nginx.conf
 COPY ./product.conf /etc/nginx/conf.d/product.conf
 COPY ./index.html /var/www/html/index.html
 COPY ./style.css /var/www/html/style.css
-COPY ./smile.jpg /var/www/html/smile.jpg
-COPY ./me.png /var/www/html/me.png
-COPY ./house.png /var/www/html/house.png
+COPY ./img/car.jpg /var/www/html/img/car.jpg
+COPY ./img/guy1.JPG /var/www/html/img/guy1.JPG
+COPY ./img/guy2.JPG /var/www/html/img/guy2.JPG
+COPY ./img/house.png /var/www/html/img/house.png
 COPY ./version /var/www/html/state/version
 
 EXPOSE 8080

@@ -66,6 +66,24 @@ h1 {
     color: #666;
 }
 
+/* 이미지를 나란히 배치하기 위한 새로운 스타일 */
+.image-row {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.image-row .image-container {
+    flex: 1;
+    max-width: 45%;
+}
+
+.image-row img {
+    width: 100%;
+    height: auto;
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 10px;
@@ -77,5 +95,14 @@ h1 {
     
     .dream-section {
         padding: 15px;
+    }
+
+    .image-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .image-row .image-container {
+        max-width: 100%;
     }
 } 
