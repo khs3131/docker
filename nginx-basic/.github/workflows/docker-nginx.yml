@@ -1,0 +1,33 @@
+name: Build Nginx Docker Image
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ✅ 레포지토리 코드 가져오기
+        uses: actions/checkout@v3
+
+      #- name: 현재 시간 확인(YYYYMMDD)
+      #  id : date
+      #   run: echo "TAG=$(date + '%Y%m%dv1')" >> "$GITHUB_OUTPUT"
+      
+      - name: 📌 GitHub 태그 개수 가져오기
+        id: get_version
+        run: |
+          VERSION_COUNT=$(git ls-remote --tags origin | grep "$(date +'%Y%m%d')" | wc -l)
+          TAG_NAME="$(date +'%Y%m%d')v$((VERSION_COUNT + 1))"
+          echo "TAG=$TAG_NAME" >> $GITHUB_OUTPUT
+
+      - name: 🐳 Docker 빌드
+        run: |
+          docker build -t chulbori/nginx-basic:${{ steps.get_version.outputs.TAG }} .
+
+      - name: 📦 Docker 이미지 확인
+        run: |
+          docker images
