@@ -1,0 +1,45 @@
+name: Multi ActionBuild Multiple Docker Images
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'nginx-basic/**'
+      - 'python-web/**'
+      - 'nodejs-web/**'
+  pull_request:
+    paths:
+      - 'nginx-basic/**'
+      - 'python-web/**'
+      - 'nodejs-web/**'
+
+jobs:
+  build-nginx:
+    if: ${{ contains(github.event.head_commit.message, 'nginx') || github.event_name == 'pull_request' && contains(join(github.event.pull_request.changed_files, ','), 'nginx-basic/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build nginx-basic
+        run: |
+          docker build -t chulbori/nginx-basic:latest ./nginx-basic
+
+  build-python:
+    if: ${{ contains(github.event.head_commit.message, 'python') || github.event_name == 'pull_request' && contains(join(github.event.pull_request.changed_files, ','), 'python-web/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build python-web
+        run: |
+          docker build -t chulbori/python-web:latest ./python-web
+
+  build-node:
+    if: ${{ contains(github.event.head_commit.message, 'node') || github.event_name == 'pull_request' && contains(join(github.event.pull_request.changed_files, ','), 'node-web/') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build node-web
+        run: |
+          docker build -t chulbori/node-web:latest ./node-web
